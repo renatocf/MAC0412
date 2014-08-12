@@ -1,0 +1,17 @@
+Avanços da Microeletrônica
+============================
+
+* VLSI (very large scale integration)
+    - Consiste em colocar uma série de transistores agregados em um
+      único chip, na escala de milhares ou milhões.
+    - Segundo a Lei de Moore, até o momento, foi possível DOBRAR a
+      quantidade de transistores dentro dos chips a cada 18 meses.
+
+* Transistores
+    - Os transistores são as peças funcamentais para a construção de
+      chips, e seu tamanho tem diminuído crescentemente ao longo dos
+      anos:
+        - 1963: 24µm
+        - 1978: 5µm
+        - 1990: 1µm
+        - 2005: 0.1µm

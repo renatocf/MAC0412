@@ -1,0 +1,23 @@
+Hardware de supercomputadores
+===============================
+
+* Earth Simulator (NEC)
+* Aumento linar na escala logarítmica
+    - Aumento do desempenho dos computadores é exponencial
+* Teconologias baseadas em silício
+
+* Processadores
+    - Arquitetura de processadores
+        - Um processador
+        - SMP (multiprocessador simétrico)        -> memória compartilhada
+        - MPP (processador massivamente paralelo) -> memórias separadas
+                                                     por processadores
+        - Cluster                                 -> agregado de 
+                                                     workstations
+        - Constelation                            -> agregado de clusters
+    
+    - Atualmente, dentro do Top500, predominam clusters e MMPs. Já não
+      temos mais SMPs porque eles não estão tão eficientes.
+
+    - Hoje, existe o Beowoulf, programa para gerenciar computadores 
+      comuns em rede, simulando um cluster com máquinas comuns.
