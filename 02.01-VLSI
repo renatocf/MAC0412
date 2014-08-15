@@ -1,0 +1,181 @@
+Very Large Scale of Integration
+==================================
+
+* Avanços da Microeletrônica
+    - Processador e memória são feitos de um mesmo materical: pastilhas
+      (chip) de silício.
+    - O elemento básico dos circuiítuos digitais é o transistor MOS
+      (Metal Oxide Semiconductor).
+    - Um transistor MOS é umaespéciede chave interruptora minúscula, de
+      ordem de alguns micrômetros quadrados de área.
+    - Presença de carga elétrica (voltagem alta) no gate permite a
+      condução de eletricidade entre os pontos D e S, ao passo que a 
+      ausência de carga (voltagem baixa) no gate impede a condução.
+        
+                                  _____
+                 Alta corrente   / G  /|
+                 -------------> / A  //
+                 Seletor de   _/ T _//  
+                 passagem    /  E //|
+                        ____/____// |_____
+          Corrente i   /  D |____/ /  S  /| Corrente i
+          ----------> /_____|____|/_____/ / ---------->
+          Corrente da |_____|     |_____|/  Só passa caso haja uma 
+          chave               ↑             alta corrente no gate.
+                            Canal
+    
+    - Tamanho (largura) de um transistor:
+        - 1963: 24.0µm
+        - 1978:  5.0µm
+        - 1990:  1.0µm
+        - 2005:  0.1µm
+        - 2014: 14  nm 
+        - 2020:  5  nm (previsão)
+
+* Tecnologia VLSI
+    - Tecnologia de microeletrônicaque integra umagrande quantidade de
+      dispositivos eletrônicos (transistores) numa pastilha (chip).
+    - SSI (Small Scale of Integration)
+      MSI (Medium Scale of Integration)
+      Integram dezenas oucentedas a milhares de transistores.
+    - LSI (Large Scale of Integration)
+      VLSI (Very Large Scale of Integration)
+      Integram mais de milhões de transistores.
+
+* Eletricidade
+                
+              Eletricidade           :        Encanamentos
+    ====================================================================
+                                     :
+          5V .----/ ------.          :       /:===(x)======:\
+             | → Corrente |          :       || → Corrente ||
+             |            |          :       ||           [  ]
+         + -----         { } lâmpada : bomba ()           [  ] turbina
+         -  ---           |          :       ||           [  ]
+     bateria |            |          :       ||            ||
+      (5V)   |------------'          :       \:============:/
+            --- 0V                   :
+             '                       :
+         - Carga elétrica            :       - Goda de água
+         - Corrente elétrica         :       - Corrente de água
+         - Voltagem                  :       - Pressão
+         - Bateria                   :       - Bomba
+         - Resistor                  :       - Turbina
+         - Capacitor                 :       - Tanque de água
+         - Chave                     :       - Registro
+
+    - O capacitor é feito para ARMAZENAR cargas, e pode ser carregado e
+      descarregado. Ele tem uma CAPACITÂNCIA, inerente à sua composição.
+      Ele tem um tempo para ser carregado/descarregado, o que toma 
+      certo tempo.
+      
+                        .-------^^^^^---------.
+                        |         R          _|__
+                        | ↑ corrente        /___/ Condutor }
+                    + -----                 /___/ Isolante } Capacitor
+                    -  ---                  /___/ Condutor }
+                        |                     |
+                        '---------------------'
+
+* Transistor MOS (Metal Oxide Semiconductor)
+    - Veremos o transistor MOS, que nada mais é que uma chave minúscula
+      (abre e fecha) feito de semicondutor (Silício Si).
+    - Usaremos a NMOS, simplificada, para facilitar o entendimento. O
+      CMOS é a tecnologia atual.
+    - Num substrato de Silício (wafer de Si) são depositadas 4 camadas
+      de material condutor: metal, polisilício e difusão.
+        
+                                            
+                               ¨¨¨¨¨¨¨¨¨ ↖ metal (condutor)
+                   óxido    ↗           
+                 (isolante) ↘  ¨¨¨¨¨¨¨¨¨ ↖ poli-silício (semicondutor)
+                 _________________________________________
+         wafer ↗ ´´´           ¨¨¨¨¨¨¨¨¨ difusão       ´´´
+      (substrato)                       (condutor)
+    
+    - Uma trilha de METAL (azul) pode cruzar uma trilha de POLISILÍCIO 
+      (vermelho) ou de DIFUSÃO (verde) sem proguzir efeito significativo.
+        
+         óxido         _____          :  óxido         _____
+             \        /    /|         :      \        /    /|
+              \    __/__  //          :       \    __/__  //
+               \  /    /|//           :        \  /    /|//
+            _____/    //_____         :     _____/    //_____
+           /    /    //     /|        :    /    /    //     /|  
+          /____/    //_____/ /        :   /____/    //_____/ / 
+          |____|    |______|/         :   |____|    |______|/     
+              /    // (poli-silício)  :       /    // (difusão)
+             /____//     vermelho     :      /____//    verde
+             |____/                   :      |____/
+                                      :     
+             (metal)                  :      (metal)
+              Azul                    :       Azul
+    
+    - Se uma trilha de posicilício cruzar uma trilha de difusõa, então
+      aparece um transistor MOS.
+                  _________________________
+                 /      _____             /
+                /      / G  /|           /
+               /      / A  //  <----------- Poli-silício (vermelho)
+              /     _/ T _//           /
+             /     /  E //| <------------ Óxido (branco)
+            / ____/____// |_____     /
+           / /  D |____/ /  S  /|   /
+          / /_____|____|/_____/ / <--- Difusão (verde)
+         /  |_____|     |_____|/  /
+        /          canal         / 
+        ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ <- Wafer (amarelo)
+    
+      Seja voltagem V_DS > 0. Seja V_lim uma pequena voltagem
+      limiar, característica do material. Dois casos:
+      1) Sem carga no gate: o circuíto entre D e S está interrompido. 
+         Logo, não passa corrente.
+      2) Com carga no gate: elétrons livres concentram-se na região 
+         do canal (pois carga positiva atrai carga negativa), então 
+         basta termos a voltagem entre o fate G e S maior que a voltagem
+         limiar, ou seja, V_GS > V_lim, para permitir a passagem de
+         corrente de D para S, onde o transistor MOS atua como uma chave
+         liga-desliga.
+                        
+                         . 3) As cargas + do gate são bloqueadas pelo
+                         :    óxido, e a indução de carga + e - faz
+                         :    com que a junção óxido + gate + canal
+                         :    do wafer aja como um CAPACITOR, que 
+                         :    vai sendo carregado.
+                         :
+                         :            /    /  2) O Gate recebe carga +
+                         :           / G  //
+                         :   _______/ A  //_____________
+                         :  /   -  / T  //    -    -   /
+         1) O D recebe   : / -    / E  //  -     -    /
+            uma corrente :/    - /    //    -  -  -  /
+            negativa     /:¨¨¨¨¨/¨¨¨¨//¨¨¨¨¨:  -    /
+            alta        / :   /++++//| óxido:-  -  /                  
+                ...____/__:__/++++// |______:_____/____...
+          D → →  - - - - -:- |____/ /       :        → → S
+              ..._________:__|____|/________:______...            
+              ..._________:__|-----|________:_____...
+                   / -  - :  -----    -  -  :  /
+                  /   -   :.................: /  4) Quando o capacitor
+                 / -   -     -   -     -     /      adquire carga maior
+                 ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨        que um limiar V_lim
+                 ^- Wafer (com elétrons livres)     inerente ao material,
+                                                    ele se descarrega
+                                                    e fecha o circuíto,
+                                                    permitindo a
+                                                    passagem de corrente
+                                                    de D para S.
+    
+    - Notação (esquemática) para o transistor:
+        
+                                      |
+                                      |
+                                      |
+                                   ___|
+                                  ||
+                        ----------||
+                                  ||
+                                   ¨¨¨|
+                                      |
+                                      |
+                                      |
