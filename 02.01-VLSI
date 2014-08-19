@@ -149,11 +149,11 @@ Very Large Scale of Integration
                          :  /   -  / T  //    -    -   /
          1) O D recebe   : / -    / E  //  -     -    /
             uma corrente :/    - /    //    -  -  -  /
-            negativa     /:¨¨¨¨¨/¨¨¨¨//¨¨¨¨¨:  -    /
+            positiva     /:¨¨¨¨¨/¨¨¨¨//¨¨¨¨¨:  -    /
             alta        / :   /++++//| óxido:-  -  /                  
                 ...____/__:__/++++// |______:_____/____...
-          D → →  - - - - -:- |____/ /       :        → → S
-              ..._________:__|____|/________:______...            
+   Drain(D) → → i→   - - -:- |____/ /       :     → i→ → Source(S)
+      ← ← e ← ..._________:__|____|/________:______... ← ← e ←
               ..._________:__|-----|________:_____...
                    / -  - :  -----    -  -  :  /
                   /   -   :.................: /  4) Quando o capacitor
@@ -167,15 +167,40 @@ Very Large Scale of Integration
                                                     de D para S.
     
     - Notação (esquemática) para o transistor:
+      (Diagrama de palito - stick diagram, usando cores)
+                                    
+                                    | 
+                                    | verde
+                    vermelho -------| 
+                                    | 
+                                    | 
         
-                                      |
-                                      |
-                                      |
-                                   ___|
-                                  ||
-                        ----------||
-                                  ||
-                                   ¨¨¨|
-                                      |
-                                      |
-                                      |
+    - Notação (esquemática) para o transistor (sem cores):
+    
+                              |              
+                              |              
+                              |              
+                           ___|             |
+                          ||              __|
+                ----------||          ---||
+                          ||              ¨¨|
+                           ¨¨¨|             |
+                              |              
+                              |             
+                              |            
+
+* Resistência dos transistores
+    - Todo transistor em condução apresenta uma resistência, cuja
+      relação pode ser expressa por R = α(L/W), sendo α uma constante
+      de proporcionalidade, e L e W, respecticamente, o tamanho do 
+      gap entre D/S e o tamanho da trilha D/S
+        
+                               |   D   |
+                               |       |
+                               |/_____\|   ___
+                      ¨¨¨¨¨¨¨¨¨:¨¨¨W¨¨¨:¨|  |       
+                      GATE     :       : |  | L     R = α(L/W)
+                      _________:_______:_|  |       
+                               |       |   ¨¨¨
+                               |       |
+                               |   S   |

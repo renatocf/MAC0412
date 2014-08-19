@@ -1,0 +1,83 @@
+Porta lógica NOT
+==================
+
+* Como vimos, um transistor tem sempre uma resistência associada. Isso
+  é extremamente importante para a formação de portas lógicas:
+
+                               |   D   |
+                               |       |
+                               |/_____\|   ___
+                      ¨¨¨¨¨¨¨¨¨:¨¨¨W¨¨¨:¨|  |       
+                      GATE     :       : |  | L     R = α(L/W)
+                      _________:_______:_|  |       
+                               |       |   ¨¨¨
+                               |       |
+                               |   S   |
+
+* Na portão NOTm há dois transistores (uma trilha de polisilício
+  cruzando uma trilha de difusão). O transistor de cima (chamado
+  transistor pull-up, pu) foi fabricado para sempre permitir a passagem
+  de corretnte. O papel é funcionar como resistência. O transistor de
+  baixo (chamado pull-down, pd) funciona como uma chave normal.
+
+               |--| W
+               
+        ¨¨¨¨¨¨¨|  |¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ Alimentação (5V)
+               |  |
+               |  | ↑ VDD
+             __|__|__                  ___
+            |  :  :  | (polisilício)    |
+            |  :  :  |                  | L_pu = 4*L_pd
+            |  :  :  |                  | (suficiente para NMOS)
+            |  :  :  |                  | 
+             ¨¨|¨¨|¨¨                  ¨¨¨
+               |  |__________________
+               |   (difusão)
+               |  |¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+         ______|__|__                  ___
+                     |                  | L_pd
+         ¨¨¨¨¨¨|¨¨|¨¨                  ¨¨¨
+               |  | ↓ GND
+               |  |
+         ______|  |___________________ Terra (0V)
+        
+        R_pu = α*L_pu/W = α*4*L_pd/W = 4*R_pd
+        R_pd = α*L_pd/W
+
+* Esquema conceitual
+                              ------*----- Vpp        
+                                  __|                 
+                              .--||   R                 
+                              |   ¨¨|                 
+                              '-----|
+                                    *----- Vout       
+                                  __|                 
+                           Vin --||                   
+                                  ¨¨|                 
+                              ------*----- 0V         
+
+
+    ================================.===============================
+        Vin < Vlim → Vout = Vpp     |    Vin > Vlim → Vout < Vlim
+                 0 → 1              |             1 → 0
+                                    | (R seja suficientemente grande)
+    --------------------------------|-------------------------------
+      ------*----- Vdd              |  ------*----- Vdd 
+            |                       |        |          
+            < R                     |        < R        
+            <                       |        <          
+            |                       |        |          
+            *----- Vout             |        *----- Vout
+            |                       |        |          
+             / aberto               |        | fechado
+            |                       |        | (R efetivo = α(L/W))
+            |                       |        |
+      ------*----- 0V               |  ------*----- 0V  
+    --------------------------------'-------------------------------
+    Quando está aberto, todo o Vdd  | Quando está fechado, parte do
+    passa para Vout: logo, quando   | Vdd vai ser aterrado: logo, 
+    temos entrada 0, a saída é 1.   | Vout < Vlim e a saída é 0.
+     
+    A maior dificuldade, nesse caso, é converter de 1 para 0. Teremos
+    duas resistências associadas: a R e uma R efetiva, do transistor.
+    Quando R > R efetivo, então Vout 
