@@ -1,0 +1,60 @@
+Porta NAND
+============
+
+    a --|¨¨\ a ∧ b       | a | b | a∧ b | ¬(a∧ b) |
+    b --|__/             |===|===|======|=========|
+                         | 0 | 0 |  0   |    1    |
+    a --|¨¨\. ¬ A ∧ B    | 0 | 1 |  0   |    1    |
+    b --|__/'            | 1 | 0 |  0   |    1    |
+                         | 1 | 1 |  1   |    0    |
+
+    
+* Na portão NAND há três transistores (uma trilha de polisilício
+  cruzando uma trilha de difusão). O formato é parecido com o 
+  da porta NOT, mas apresenta dois transistores associados em 
+  SÉRIE - formando uma porta NAND.
+
+               |--| W
+
+        ¨¨¨¨¨¨¨|  |¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ Alimentação (5V) (metal)
+               |  |
+               |  | ↑ VDD
+             __|__|__                  ___
+            |  :  :  | (polisilício)    |
+            |  :  :  |                  | L_pu = 8*L_pd1 = 8*L_pd2
+            |  :  :  |                  | (suficiente para NMOS)
+            |  :  :  |                  | 
+            |  :  :  |                  |
+            |  :  :  |                  | 
+            |  :  :  |                  | 
+            |  :  :  |                  | 
+             ¨¨|¨¨|¨¨                  ¨¨¨
+               |  |__________________
+               |   (difusão)
+               |  |¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+         ______|__|__                  ___
+                     | A (entrada 1)    | L_pd1
+         ¨¨¨¨¨¨|¨¨|¨¨                  ¨¨¨
+         ______|__|__                  ___
+                     | B (entrada 2)    | L_pd2
+         ¨¨¨¨¨¨|¨¨|¨¨                  ¨¨¨
+               |  | ↓ GND
+         ______|  |___________________ Terra (0V) (metal)
+    
+        R_pu = α*L_pu/W = α*8*L_pd1/W = 4*R_pd
+        R_pd = 2*α*L_pd/W
+
+* Esquema conceitual
+                              ------*----- Vpp        
+                                  __|                 
+                              .--||   R                 
+                              |   ¨¨|                 
+                              '-----|
+                                    *----- Vout       
+                                  __|                 
+                             B --||                   
+                                  ¨¨|                 
+                                  __|                 
+                             A --||                   
+                                  ¨¨|                 
+                              ------*----- 0V         
