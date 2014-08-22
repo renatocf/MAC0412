@@ -14,7 +14,7 @@ Porta lógica NOT
                                |       |
                                |   S   |
 
-* Na portão NOTm há dois transistores (uma trilha de polisilício
+* Na portão NOT há dois transistores (uma trilha de polisilício
   cruzando uma trilha de difusão). O transistor de cima (chamado
   transistor pull-up, pu) foi fabricado para sempre permitir a passagem
   de corretnte. O papel é funcionar como resistência. O transistor de
@@ -22,7 +22,7 @@ Porta lógica NOT
 
                |--| W
                
-        ¨¨¨¨¨¨¨|  |¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ Alimentação (5V)
+        ¨¨¨¨¨¨¨|  |¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ Alimentação (5V) (metal)
                |  |
                |  | ↑ VDD
              __|__|__                  ___
@@ -39,7 +39,7 @@ Porta lógica NOT
          ¨¨¨¨¨¨|¨¨|¨¨                  ¨¨¨
                |  | ↓ GND
                |  |
-         ______|  |___________________ Terra (0V)
+         ______|  |___________________ Terra (0V) (metal)
         
         R_pu = α*L_pu/W = α*4*L_pd/W = 4*R_pd
         R_pd = α*L_pd/W
