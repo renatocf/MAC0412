@@ -1,0 +1,101 @@
+Organização de um computador
+==============================
+
+* Máquina multi-nível
+    - Nível 3: Sistema Operacional
+    - Nível 2: Máquina convencional
+        Nesse nível temos a chamada linguagem de máquina e as instruções
+        de máquina definidas em manuais de referência da máquina.
+    - Nível 1: Microprogramação
+        Nesse nível são interpretadas as instruções das instruções de
+        máquina do nível convencional, transformando cada instrução de
+        máquina em uma coleção de micro-instruções chamada
+        microprograma.
+    - Nível 0: Lógica Digital
+        Nesse nível, as micro-instruções do microprograma são executadas
+        diretamente em hardware.
+
+* Arquitetura de von Neumann
+    - A arquitetura de armazenar o programa em memória e a execução das
+      instruções no processador é conhecida pelo nome de Arquitetura de
+      von Neumann.
+    
+          .-------.   .-----------.   .---------.   .--------------.
+          |       |   |           |   |         |   |              |
+          |  CPU  |   |  Memória  |   |  Disco  |   |  Outros I/O  |
+          |       |   |           |   |         |   |              |
+          '-------'   '-----------'   '---------'   '--------------'
+          ____|_____________|______________|________________|_______
+                               barramento ou "bus"
+    
+    - Tanto o programa quanto os dados ficam guardados na memória.
+    - As diferenças de avanço de velocidade do processador e da
+      memória causa um atraso drástico na hora de fazer acessos.
+      Esse é o "von Neumann battleneck" ("gargalo de von Neumann").
+
+* CPU
+    - Ações principais:
+        - BUSCA uma instrução na memória
+        - DECODIFICA a instrução
+        - EXECUTA a instrução
+    
+    - Componenentes do processador:
+        - Controlador: faz o ciclo fetch-decode-execute
+        - ALU: unidade lógica aritmética
+        - Registradores: memória mais rápida, dentro do processador
+    
+    - Registradores importantes
+        - PC ("Program Counter") - contém o endereço de memória da
+          próxima instrução a ser executada.
+        - IR ("Instruction Register") - contém a instrução em execução.
+        - PS ou PSW ("Program status word") - contém uma série de
+          informações de controle, dando o estado do processador 
+          (conteúdo varia de máquina para máquina).
+    
+    - Ciclo "fetch-decode-execute"
+        - A CPU realiza repretidamente o seguinte ciclo:
+            1. Busca a instrução (apontada por PC) da memória e
+               carrega-a no IR.
+            2. Muda o PC para apontar para a próxima instrução da
+               memória.
+            3. Decodifica a instrução, determinando o seu tipo,
+               operandos, etc.
+            4. Se a instrução usa operandos (dados) da memória,
+               determina seus esdereços.
+            5. Busca os dados de memória e carrega-os nos registradores.
+            6. Executa a instrução.
+            7. Armazena resultados (em registradores ou memórias).
+    
+    - Conjunto de instruções ou "instruction set"
+        - Denomina-se "instruction set" de uma máquina o conjunto de
+          instruções disponíveis ao programador no nível de máquina
+          convencional.
+        - Existem duas famílias principais:
+            - CISC (Complex Instruction Set Computer): possui um 
+              conjunto grande de instruções complexas (várias 
+              centenas). Essas instruções são interpretadas no nível 
+              de microprogramas.
+            - RISC (Reduced Instruction Set Computer): possuem um 
+              pequeno conjunto de instruções simples, executadas 
+              diretamente em hardware. Não há microprogramação.
+    
+    - Organização da CPU
+        - "Data path" de uma CPU típica é mostrado abaixo e inclui a 
+          ALU (Unidade Lógica-Aritmética), os registradores e
+          interconexões.
+          
+                      .---------.
+                      |         |
+                      | .---------------.
+                      | | Registradores |
+                      | '---------------'
+                      |      |     |
+                      |    .---. .---.
+                      |    |   | |   |  Reg. de entrada da ALU
+                      |    '---' '---'
+                      |      |     |
+                      |    .---------.
+                      |    |   ALU   |
+                      |    '---------'
+                      |         |
+                      '---------'

@@ -1,0 +1,22 @@
+Atraso em portas lógicas
+==========================
+
+        _____________________           _____________________
+        VDD   |         |               VDD   |         |
+             _|        _|                     |         |
+          .-||      .-||                    .---      .---
+          |  ¨|     |  ¨|                   | |       | |
+          '---*     '---*                   '-*       '-*   
+              |---.     |-- 0                 |----.    |-- 0
+             _|   |  1 _|                     |    |  1 |
+        0 --||    '---||                0 ------   *------
+             ¨|        ¨|                     |         |
+        GND   |         |               GND   |         |
+        ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨           ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+    
+    Na tecnologia NMOS, a velocidade de mudança de 0 para 1 e 1 para 0 é
+    muito diferente. Para que duas portas NOT, concatenadas, repassem
+    o sinal 0, é necessário carregar o capacitor do transistor da
+    segunda porta NOT. Para repassar o sinal 1, só basta carregar o 
+    capacitor do primeiro transistor. Como esse tempo não é interno
+    à interação entre as portas, então mudar 0 → 1 é melhor que 1 → 0.
