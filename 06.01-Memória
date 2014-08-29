@@ -1,0 +1,208 @@
+Memória
+=========
+
+* Hierarquia de memória
+    - Registradores (memória mínima, em dezenas/centenas)
+    - on-chip cache (memória auxiliar pequena, dentro do chip)
+    - off-chip cache (memória auxiliar um pouco maior, próxima,
+                      mas fora de um chip)
+    - memória principal (RAM)
+    - armazenamento secundário (discos)
+    - outros armazenamentos remotos (arquivos distribuídos, servidores,
+      web).
+    
+    - Distribuição da memória pelo compudador
+    
+        .-----------.       .-----------.       .-----------.
+        |      Reg  | cache |           |       |           |
+        | CPU [   ] | [   ] |  Memória  |       |   Disco   |
+        |     cache |       |           |       |           |
+        |     [   ] |       |           |       |           |
+        '-----------'       '-----------'       '-----------'
+        ______|___________________|___________________|______
+        
+    
+    - Exemplo de esquema de hierarquia
+                
+      /\                        ^
+      || Menor                 / \
+      || Mais rápido          /   \
+      || Mais caro           /     \
+      || (por byte)         /       \
+      ||                   /registers\   } Registradores da CPU
+                          /-----------\  } armazenam paralavras
+      ||                 /  on-chip L1 \ } vindas do cache L1
+      || Maior          /  cache (SRAM) \   } Cache L1 armazena
+      || Mais lento    /-----------------\  } linhas recuperadas do
+      || Mais barato  /    off-chip L2    \ } cache L2
+      || (por byte)  /     cache (SRAM)    \   } Cache L2 armazena
+      \/            /-----------------------\  } linhas recuperadas
+                   /    main memory (DRAM)   \ } da memória principal
+                  /                           \   } Memória principal
+                 /-----------------------------\  } armazena blocos
+                /   local secondary storage     \ } vindos do disco
+               /         (local disks)           \      } Discos locais
+              /-----------------------------------\     } armazenam
+             /      remote secondary storage       \    } arquivos
+            /      (distributed file systems,       \   } de discos ou
+           /              Web servers)               \  } servidores 
+          /___________________________________________\ } remotos
+        
+    - A memória (DRAM) e os caches (SRAM) são, ambos, voláteis. Eles
+      precisam de um 'refreshing' constante, que rearmazena a energia
+      para manter os bytes. Quando são desligados, acabam a apagando 
+      os dados.
+    
+    - Os discos e fitas magnéticas são duráveis, e mesmo desligados
+      armazenam os dados por longos períodos de tempo. Porém, ambos
+      são bem mais lentos, pois os discos são superposições de camadas
+      de armazenamentos que giram e há um tempo de 'set up' para que
+      uma cabeça de leitura chegue até a área dos dados, lendo-os
+      em conjunto segundo uma estrutura de árvore B. As fitas, mais
+      lentas ainda, só suportam acesso sequencial, e precisam andar
+      para frente e para trás para acessar dados em campos diferentes.
+    
+    - Comparação de tamanho elatência de itens:
+    
+        .-------------.----------------------.----------------------.
+        | Cache type  | Size of item (bytes) | Latency (cpu cycles) |
+        |-------------|----------------------|----------------------|
+        | Registers   |  4 bytes             | 0                    |
+        |-------------|----------------------|----------------------|
+        | L1 cache    | 32 bytes             | 1                    |
+        |-------------|----------------------|----------------------|
+        | L2 cache    | 32 bytes             | 10                   |
+        |-------------|----------------------|----------------------|
+        | Main memory |  4 KB pages          | 100                  |
+        |-------------|----------------------|----------------------|
+        | Disk        |                      | millions             |
+        '-------------'----------------------'----------------------
+
+* Código de detecção e correção de erros
+    - Erros de leitura e escrita de memória podem ocorrer, como por
+      problemas de voltagem nas linhas.
+    - Códigos de detecção e de correção são usados pra detectar ou
+      corrigir erros de memória.
+    - Bits adicionais sãoacrescentados a cada palavra de memória.
+    - Algumas dessas técnicas podem ser usadas para transmissão de 
+      dados (transmiticos como uso de modems)
+    
+        ___________
+       |___________| palavras
+       |___________|
+       |___________|          .------------.  bloco  .------------. 
+       |___________|          | Computador |____>____| Computador |
+       |___________|          |            |         |            |
+       |___________|          '------------'         '------------'
+    
+    - Código de detecção
+        - Um bit paridade é acrescentado a cada palavra da memória
+        
+                      |  palavra  | | < bit paridade
+        
+        - O bit paridade é escolhido de tal modo que o número de 1's 
+          do código resultante (palavra+paridade) é par (ou ímpar).
+        
+        - Esse código detecta erros de 1 só bit no código
+        
+        - Seja o código 00110 (último bit é paridade)
+            - Se lido como 01110 (erro de 1 bit: erro detectado)
+            - Se lido como 00111 (erro de 1 bit: erro detectado)
+            - Se lido como 01111 (erro de 2 bits: não detectado)
+        
+        - Essa técnica não funciona para detectar mais de um erro.
+          Portanto, serve principalmente para palavras pequenas.
+        
+        - Para calcular a paridade de um número, é simples: basta
+          fazer XOR de cada bit.
+    
+    - Código de correção (código de Hamming)
+        - O código de detecção pode detectar erro, mas não se sabe nde
+          ocorreu o erro - isto é, qual o bit errado. O dado precisa ser
+          lido de novo da memória ou retransmitido no caso de
+          transmissão de dados.
+        - O código de correção permite saber onde está o erro. Assim,
+          é possível corrigí-lo.
+        
+        - Seja um dado de 4 bits. Vamos acrescentar, nesse caso, mais
+          3 bits adicionais.
+        
+          Usamos o diagrama abaixo apenas para ilustrção, no caso
+          específico de 4 bits. O método com diagrama não serve para 
+          o caso geral em que o dado possui bastante bits. Mostramos
+          como tratar do caso geral mais tarde.
+          
+          Seja o dado 1101. Para obter os 3 bits extras, vamos, 
+          inicialmente, encarar 1101 como bits de regiões de 
+          intersecção AB, AC, BC, ABC, onde A, B e C são diagrams 
+          de Venn.
+
+                        .-----------.
+                        | A         |
+                        |       .---|-------.
+                        |       | 1 |     C |
+                        |   .---|---|---.   |
+                        |   | 1 | 1 | 0 |   |
+                        '---|---|---'   |   |
+                            |   |       |   |
+                            |   '-------|---'
+                            | B         |
+                            '-----------'
+        
+          Para cada região, acrescenta-se um bit paridade, conforme
+          as regras sitadas anteriormente, para cada região A/B/C.
+          
+                        .-----------.
+                        | A 1       |
+                        |       .---|-------.
+                        |       | 1 |     C |
+                        |   .---|---|---.   |
+                        |   | 1 | 1 | 0 | 0 |
+                        '---|---|---'   |   |
+                            |   |       |   |
+                            |   '-------|---'
+                            | B  0      |
+                            '-----------'
+          
+          Os 3 bits de paridade gerados são usados juntamente com os
+          outros 4 bits da informação.
+          
+          O erro de 1 bit (qualquer um dos 7 bits) pode ser localizado
+          e corrigido. Tal erro pode ser detectado de modo simples,
+          como se segue.
+          
+                        .-----------.   bit incorreto
+                        | A 1       | ↙ 
+                        |       .---|-------.
+                        |       |"0"|     C |
+                        |   .---|---|---.   |
+                        |   | 1 | 1 | 0 | 0 |
+                        '---|---|---'   |   |
+                            |   |       |   |
+                            |   '-------|---'
+                            | B  0      |
+                            '-----------'
+          
+          Região A: paridade errada
+          Região B: paridade OK
+          Região C: paridade errada
+          Conclusão: região AC errada. Logo, o bit daquela região
+                     deveria ser 1.
+
+    - Caso geral do Código de Correção
+        - Seja um dado de 'n' bits. Mostraremos um método para
+          obter o k bits adicionais: k = 1+ ⌈log n⌉
+        - Tabela de crescimento do número de bits:
+            
+           | Palavra de |   k bits   | Total | overhead |
+           .------------.------------.-------.----------.
+           |  n bits    | adicionais | bits  |   (%)    |
+           |============|============|=======|==========|
+           |  4         |     3      |  7    |    75    |
+           |  até 8     |     4      |  12   |    50    |
+           |  até 16    |     5      |  21   |    31    |
+           |  até 32    |     6      |  38   |    19    |
+           |  até 64    |     7      |  71   |    11    |
+           |  até 128   |     8      |  136  |     4    |
+           |  até 256   |     9      |  265  |     6    |
+           '------------'------------'-------'----------'
