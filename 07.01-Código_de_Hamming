@@ -1,0 +1,111 @@
+Código de Hamming
+===================
+
+* Método geral para qualquer 'n'
+* Vejamos como calcular para '8' bits:
+    
+    1. Separamos os '8' bits em m_1 .. m_8:
+        m_1 m_2 m_3 m_4 m_5 m_6 m_7 m_8
+    
+    2. Usaremos 12 bits (8 + ⌈log 8⌉+1)
+        x_1 x_2 x_3 x_4 x_5 x_6 x_7 x_8 x_9 x_10 x_11 x_12
+    
+    3. Separamos os bits que têm índice com potência de 2
+        (x_1) (x_2) x_3 (x_4) x_5 x_6 x_7 (x_8) x_9 x_10 x_11 x_12
+    
+    4. Aos bits restantes, associamos os bits do número original
+        (x_1) (x_2) x_3 (x_4) x_5 x_6 x_7 (x_8) x_9 x_10 x_11 x_12
+                    m_1       m_2 m_3 m_4       m_5  m_6  m_7  m_8
+    
+    5. Cada x_i é calculado como a paridade de outros bits (usando
+       múltiplas operações XOR (⊕ )).
+        
+         x_1 = x_3 ⊕ x_5 ⊕ x_7 ⊕ x_9 ⊕ x_11          .---------.
+         x_2 = x_3 ⊕ x_6 ⊕ x_7 ⊕ x_10 ⊕ x_11         | 8 4 2 1 |
+         x_4 = x_5 ⊕ x_6 ⊕ x_7 ⊕ x_12           .----|---------|
+         x_8 = x_9 ⊕ x_10 ⊕ x_11 ⊕ x_12         | 01 | 0 0 0 1 |
+                                                | 02 | 0 0 1 0 |
+         Os números usados no XOR são obtidos   | 03 | 0 0 1 1 |
+         a partir da conversão dos números de   | 04 | 0 1 0 0 |
+         1 a 12 para a base binária. Como eles  | 05 | 0 1 0 1 |
+         são escritos em termos de potências    | 06 | 0 1 1 0 |
+         de 2, usamos todos os números que      | 07 | 0 1 1 1 |
+         são diferentes da potência de 2        | 08 | 1 0 0 0 |
+         (1/2/4/8) mas as usam na sua           | 09 | 1 0 0 1 |
+         escrita binária dentro do XOR.         | 10 | 1 0 1 0 |
+                                                | 11 | 1 0 1 1 |
+                                                | 12 | 1 1 0 0 |
+                                                '----'---------'
+      
+    6. O número encontrado usando os bits adicionais é o número de
+       Hamming.
+      
+    Ex: 
+       Número: 11110001
+       
+       número       |x_1|x_2|x_3|x_4|x_5|x_6|x_7|x_8|x_9|x_10|x_11|x_12|
+                    |---|---|---|---|---|---|---|---|---|----|----|----|
+       nº Hamming |(1)|(1)| 1 |(0)| 1 | 1 | 1 |(0)| 0 |  0 |  0 |  1 |
+                    |---|---|---|---|---|---|---|---|---|----|----|----|
+       leitura      |y_1|y_2|y_3|y_4|y_5|y_6|y_7|y_8|y_9|y_10|y_11|y_12|
+
+* Correção de erro
+    
+    - Para corrigirmos o erro, consideraremos os bits k_1, k_2, 
+      k_3 e k_4, obtidos como o XOR de:
+       
+        k_1 = x_3 ⊕ x_5 ⊕ x_7 ⊕ x_9 ⊕ x_11 
+        k_2 = x_3 ⊕ x_6 ⊕ x_7 ⊕ x_10 ⊕ x_11
+        k_4 = x_5 ⊕ x_6 ⊕ x_7 ⊕ x_12       
+        k_8 = x_9 ⊕ x_10 ⊕ x_11 ⊕ x_12     
+      
+      Se k_1 = k_2 = k_3 = k_4 = 0, então o número está correto.
+      Caso contrário, (k_4k_3k_2k_1) será o índice do erro.
+       
+    - Ex:   
+        
+        Número: 11110001
+        
+        número       |x_1|x_2|x_3|x_4|x_5|x_6|x_7|x_8|x_9|x_10|x_11|x_12|
+                     |---|---|---|---|---|---|---|---|---|----|----|----|
+        nº Hamming |(1)|(1)| 1 |(0)| 1 | 1 | 1 |(0)| 0 |  0 |  0 |  1 |
+                     |---|---|---|---|---|---|---|---|---|----|----|----|
+        leitura      |y_1|y_2|y_3|y_4|y_5|y_6|y_7|y_8|y_9|y_10|y_11|y_12|
+        
+        Suponhamos a leitura de 11010001 (3º número errado)
+        
+        (1) (1) 1 (0) 1 [0] 1 (1) 0 0 0 1
+        k_1 = 0, k_2 = 1, k_3 = 1 e k_4 = 0
+        
+        Logo, o bit errado é (0111)_2 = 6
+    
+    - O código de Hamming, porém, SÓ FUNCIONA PARA 1 BIT.
+
+* Erro com mais de 1 bit
+    
+    - Vamos acrescentar a cada pacote de Hamming os números de Hamming.
+        
+        |_______________| pacote de Hamming
+        |_______________| pacote de Hamming
+        |_______________| pacote de Hamming
+        |_______________| pacote de Hamming
+        |_______________| pacote de Hamming
+        |_______________| pacote de Hamming
+        |               | pacote de Hamming
+        
+    - Para evitarmos erros de mais de 1 bit, basta transmitirmos a 
+      matriz por COLUNA. No outro lado da recepção, coletamos os 
+      bits recebidos para reconstruir a matriz.
+        
+          ^ ^ ^ ^ ^ ^ ^
+        |_:_:_:_:_:_:_:_| pacote de Hamming
+        |_:_:_:_:_:_:_:_| pacote de Hamming
+        |_:_:_:_:_:_:_:_| pacote de Hamming
+        |_:_:_:_:_:_:_:_| pacote de Hamming
+        |_:_:_:_:_:_:_:_| pacote de Hamming
+        |_:_:_:_:_:_:_:_| pacote de Hamming
+        | : : : : : : : | pacote de Hamming
+        
+    - Agora, aplicamos o método de Hamming para cada pacote de Hamming
+      recebido. Caso haja erros, provavelmente os problemas serão 
+      relacionados a vida.
