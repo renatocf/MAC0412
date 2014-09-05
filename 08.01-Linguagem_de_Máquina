@@ -1,0 +1,153 @@
+Linguagem de Máquina
+======================
+
+* Máquina multinível
+    - Nível 3: SO
+    - Nível 2: Máquina Convencional
+    - Nível 1: Microprogramação
+    - Nível 0: Lógica digital
+
+                                      Memória
+    .--------.                        .-----.
+    | Código |     .------------.     |:::  |
+    | Fonte  |---> | Compilador |---> |:::  |
+    |   C    |     '------------'     |:::  |
+    '--------'                        '-----'
+                                        ↕
+                                 .---------------.
+                                 |      CPU      |
+                                 '---------------'
+
+* Projeto do Formato de Instruções
+    - Na arquitetura de von Neumann, o programa está na memória e cada
+      instrução é executada no processador.
+    - O processador (datapath) pode operar dados de um certo número de
+      bits, como 64 bits). O barraento (bus) pode transortar em paralelo
+      um certo número de bits, digamos 64 bits.
+    - O formato de instruções portanto éimportante, uma vez que cada 
+      instrução deve ser levada da memória para o processador, para ali
+      ser executada.
+
+* Espaço de endereçamento
+    - Um endereço absoluto de 'm' bits pode endereçar 2^m posições da
+      memória.
+    - Há várias maneiras de obter tal endereço absoluto
+        - Contido na própria instrução
+            
+                |      |        |        |
+                 opcode operando operando
+            
+            - Problemas:
+            - Instrução muito longa caso a memória seja grande,
+              o que acarreta MAIS TEMPO para levar a instrução
+              para o processador.
+            - O espaço de endereçamento é limitado
+            
+        - Uso de registradores base
+                
+            - O endereço éobtido somando-se o conteúdo de um registrador
+              base e um deslocamento ("offset")
+            - Ex: IBM 360 e 370 possuem 16 registradores, com 24 bits
+              cada registradore dedicados para endereçamento.
+            
+              |  4  |     12     |  
+                reg.   "offset"
+                base
+            
+        - Uso de registradores de segmento
+            
+            - Registradores de segmento apontam para determinados
+              segumentos (programa, dados, pilha, etc). Um desclocamento
+              ("offset") determina a posição dentro do segmento.
+            - Ex: Intel 8088 e 8086 apresentam 4 registradores de 
+              segmento chamados:
+                - CS: code segment
+                - DS: data segment
+                - SR: stack register
+        
+        - Uso de registradores de banco
+            - Economiza memória somando, ao endereço, apena o NOME DO 
+              REGISTRADOR COM A BASE.
+            - É mais econômico para os registradores, e é usado em
+              multiprocessadores.
+            
+        - Uso de modos de endereçamento
+                    
+                        |  2  | 1 |   3   |
+                         modo   |    reg
+                                '-- Indireto 
+            
+            - Modos:
+                - modo 00
+                    registrador: registrador contém o operando
+                - modo 01
+                    auto-incr: registrador é incrementado após uso como 
+                    endereço do operando.
+                - modo 10
+                    auto-decr: registrador é decrementado e usado como 
+                    endereço do operando.
+                - modo 11
+                    indexado: conteúdo da palavra seguinte à instrução é
+                    somado com conteúdo do registrador reg para dar o 
+                    endereço do operando.
+            
+            - Ex:
+                
+                Somando 1+1
+                                   .------------------------. 
+                | ADD |11:1:010|11:0:111|       47 |       12 |
+                           '---------------------'
+                
+                                  |        |
+                  Reg             |        |
+                0|    |  .--> 1001|        |
+                1|    |  |     || |        |
+                2|1001:--'     || |        |
+                3|    |       ...    ...    
+                4|    |        \/ |        |
+                5|    |       1048|  2004  |
+                6|    |           |        |
+                7|2006:--.           ...     
+                         |        |        |
+                         |    2004|    1   |
+                         |        |        |
+                         '----2006|        |
+                               || |        |
+                                     ...    
+                               \/ |        |
+                              2018|    1   |
+                    
+            - Outros exemplos: Intel e Motorola usam esquemas análogos,
+              mas mais complexos.
+
+* Critérios para escolha do formato de instruções
+
+    1. Instruções curtas são preferíveis a instruções longas
+    2. Razão entre t (velocidade de transferência de instruções da
+       memória para processador) e r (tamanho da instrução): t/r
+    3. É ideal queo tamanho das instruções não passe do tamanho
+       das palavras na memória/CPU
+
+* Opcodes expansíveis
+    - Consideremos um exemplo de uma máquina cujas instruções têm
+      16 bits. Uma forma possível é colocar:
+        
+                | opcode | end. 1 | end.2 | end. 3 |
+                  4 bits   4 bits   4 bits  4 bits
+    
+    - Suponhamos, porém que precisamos de:
+        
+        - 15 instruções de 3 endereços
+            Opcode vai de 0000 a 1110 (15)
+        
+        - 14 instruções de 2 endereços 
+          (1111 é prefixo de instrução de 2 endereços)
+            1111:0000 a 1111:1101 (14)
+        
+        - 31 instruções de 1 endereço
+          (1111:1110 é prefixo de 16 instruções de 1 endereço,
+           1111:1111 é prefixo de 15 instruções de 1 endereço)
+            1111:1110:0000 a 1111:1110:1111 (16)
+            1111:1111:0000 a 1111:1110:1110 (15)
+        
+        - Restantes instruções de 0 endereços 
