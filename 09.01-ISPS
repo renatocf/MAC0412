@@ -1,0 +1,139 @@
+ISPS (Instruction Set Processor Specification)
+================================================
+
+* Criada por Simon e Newell
+* ISPS é uma linguagem de descrição formal de hardware do nível
+  convencional de uma máquina, para descrever:
+    - Estado do processador Pc
+    - Estado da memória Mp
+    - Cálculo do endereço efetivo
+    - O que é executado em cada instrução
+    - Ciclo de interpretação de instruções
+
+* Uma especificação formal possibilita a simulação e sńtese de hardware,
+  avaliação de arquitetura, análise e diagnóstico de falhas, geração de
+  compiladores, etc.
+  
+                     .----------------.           }
+                     | Descrição ISPS |           }
+                     '----------------'           }
+                             |                    }
+                       .------------.             }
+                       | Analisador |             }
+                       '------------'             } D.A
+                             |                    } Design
+               .---------------------------.      } Automation
+               | Base de dados específicos |      }
+               '---------------------------'      }
+               |     |      |        |     |      }
+           Simulação |  Compilador   |  Análise   }
+                     | de compilador | de falhas  }
+                     |               |            }
+                 Avaliação        Projeto         }
+               de arquitetura   Automatizado      }
+    
+    Algumas das vantagens existentes no D.A é que um programa
+    automatizado é mais eficiente para gerar arquiteturas de 
+    hardware mais otimizadas.
+    
+    Também existe o C.A.D (Computer-Aided Design), que serve de auxiliar
+    para o projetista fazer o seu design sozinho.
+
+* Estado do processador (Pc)
+    - Registradores e flags (registradores de 1 bit) que guardam
+      informações de uma instrução, informações essas disponíveis 
+      para a execução da próxima instrução.
+        - PC ou "program counter".
+        - apontador a pilha.
+        - códigos de condição (resultados de comparação).
+        - prioridade do processo.
+        - valores intermediários de computações.
+    
+    - Ex: IBM 370
+    
+         Registradores   Registradores        PSW
+            0    31      0        63       0        63
+        R00 |    |       |        |        |     |24|   
+        R01 |    |       |        |         program counter
+        R02 |    |       |        |     (Estado do processo)
+          . |    |       |        |
+          . |    |       |        |
+            |    |       |        |
+        R15 |    |       |        |
+    
+    - Nossa linguagem apresentará como mostrar todos os registradores
+      e flags.
+        
+* Estado da memória (Mp)
+    - É o conjunto das palavras da memória principal.
+    - Ex: o estado da memória do IBM370
+        
+                        Mp[0:2^24-1]<0:7>
+               (16M palavras cada uma com 8 bits)
+    
+* ISPS - Sintaxe e Semântica
+    - Apresentamos uma introdução a ISPS, sem incluir todos os detalhes.
+    - Daremos a sintaxe e semântica da linguagem.
+    - Para fins didáticos, mostramos o ISPS de um microcomputador
+      simples.
+    
+    - Estado de Memória
+        - No PDP-8, a memória é um array de palavras, de 0 a 255
+          especificados entre colchetes quadrados. Cada palavra é de 
+          12 bits, numerados de 0 a 11, da esquerda para a direita,
+          especificada pelos colchetes angulares.
+        
+                    Mp\Primary.Memory[0:255]<0:11>
+        
+        - Mp é o nome oficial da memória.
+        - Primary.Memory é um "apelido" ou "comentário".
+        
+        - Concenção no ISPS: nomes que começam com letra maiúscula
+          para designar componentes concretas (físicas).
+    
+    - Estado do processador
+        - No PDP-8:
+            
+                Acc\Accumulator<0:11>,                  . Registrador
+                PC\Program.Counter<0:7>,                ' simples
+                IR\Instruction.Register<0:11>,          .
+                    Op\Operation.Code<0:2> := IR<0:2>,  | Registrador
+                    Ibit\Indirect.Bit<> := IR<3>,       | subdividido
+                    Adr\Address<0:7> := IR<4:11>        '
+                Interrupt.Enable<>,                     . Flags
+                Interrupt.Request<>                     '
+        
+    - Cálculo do endereço efetivo
+        - A memória só tem 256 palavras; portanto os endereços são
+          de 8 bits.
+        - O endereço efetivo (de um operando ou uma instrução) é
+          obtida por uma regra de interŕetação, especificado na forma
+          de um algoritmo.
+        
+        - No PDP-8:
+            
+            Z\Effective.Address<0:7>
+                Begin
+                If Ibit Eql 0 => Z <- Adr;
+                If Ibit Eql 1 => Z <- Mp[Adr]<4:11>
+                End
+            
+            - Z tem 8 bits e guarda o resultado do cálculo do endereço
+              efetivo.
+            - O corpo do procedimento vai entre Begin e End.
+            - O separador (;) separa comandos que podem ser executados
+              em PARALELO.
+            - No ISPS, o paralelismo ou concorrência é o padrão.
+            
+            - Comandos executados em sequência são separados pela
+              palavra 'Next', como a seguir:
+                
+                Begin
+                Decode Ibit =>
+                    Begin
+                    0 := Z<-Adr,
+                    1 := Z->Mp[Adr]
+                    End
+                End
+            
+            - Decode funciona como um comando "switch-case"
