@@ -1,0 +1,121 @@
+================================================
+    
+         Mp
+      .-------.         .---------------------------.
+    0 |       |         |   Acc                     |
+      |-------|         |  .----------------.       |
+    1 |       |         |  |                |       |
+      |-------|         |  '----------------'       |
+    2 |       |         |   IR                      |
+      |-------|         |  .---.-.----------.       |
+    3 |       |         |  |   | |          |       |
+      |-------|         |  '---'-'----------'       |
+    4 |       |         |   Op Ibit  Addr           |
+      |-------|         |                           |
+    5 |       |         |   PC                      |
+      |-------|         |  .----------------.       |
+    6 |       |         |  |                |       |
+      |-------|         |  '----------------'       |
+    7 |       |         |                           |
+      |-------|         |  [ ] Interrupt Enable     |
+    8 |       |         |  [ ] Interrupt Request    |
+      '-------'         '---------------------------'
+
+* Interpretação da instrução
+    
+    - Instrução no PDP-8:
+        
+        IR\Instruction.Register<0:11>,
+            Op\Operation.Code<0:2> := IR<0:2>
+            Ibit\Indirect.Bit<>:=IR<3>,
+            Adr\Address<0:7>:=IR<4:11>,
+    
+    - No PDP-8, o código de operação Op tem 3 bits.
+      Logo, é possível termos 8 instruções diferentes,
+    
+    - Execução de instrução no PDP-8:
+        
+        IExec\Instruction.Execution :=
+            Begin
+            If Op Eql 0 => Acc <- Acc And Mp[Z()];
+            If Op Eql 1 => Acc <- Acc + Mp[Z()];
+            If Op Eql 2 =>
+                Begin
+                Mp[Z] <- Mp[Z()] + 1 Next
+                If Mp[Z] Eql 0 => PC <- PC+1
+                End;
+            If Op Eql 3 => Mp[Z()]@Acc <- Acc@#0000;
+            If Op Eql 4 => Stop();
+            If Op Eql 5 => PC <- Z();
+            If Op Eql 6 => ... (a ser visto)
+            If Op Eql 7 => ... (a ser visto)
+            End
+        
+    - Veremos cada uma dessas 8 instruções.
+    
+    - Operação 0:
+        - If Op Eql 0 => Acc <- Acc And Mp[Z()];
+        - Z() é usado para indicar uma chamada de algoritmo 
+          o cálculo do endereço efetivo Z.
+    
+    - Operação 1:
+        - If Op Eql 0 => Acc <- Acc + Mp[Z()];
+        - Mesmo caso da anterior
+                
+    - Operação 2:
+        - If Op Eql 2 =>
+              Begin
+              Mp[Z] <- Mp[Z()] + 1 Next
+              If Mp[Z] Eql 0 => PC <- PC+1
+              End;
+        
+        - Next separa comandos executados sequencialmente: o comando
+          que precede Next deve ser completado antes da execução do
+          comando seguinte.
+        - O cálculo de endereço é feito por Z(), apenas uma vez. Z
+          SEM PARÊNTESIS significa usar o endereço calculado.
+        - O ISPS adota as seguintes notações:
+            - # indica dígito octal         (ex: #7777)
+            - ' indica dígito binário       (ex: '1111)
+            - " indica dígito hexadecimal   (ex: "AAAA)
+
+    - Operação 3: 
+        - If Op Eql 3 => Mp[Z()]@Acc <- Acc@#0000;
+        - O resultado dessa instrução é armazenar 24 bits (12 do
+          acumulador mais 12 bits 0), metade na memória e metade
+          no acumulador. Isso é equivalente a fazer:
+        - Begin
+            Mp[Z()] <- Acc Next
+            Acc <- 0
+            End
+    
+    - Operação 4:
+        - If Op Eql 4 => Stop();
+        - Stop é uma instrução primitiva do ISPS para congelar o 
+          estado da máquina permanentemente.
+    
+    - Operação 5:
+        - If Op Eql 5 => PC <- Z();
+        - É a instrução de desvio: altera a sequência normal de
+          execução de instruções.
+    
+    - Operação 6 e 7: explicadas mais tarde...
+    
+* Ciclo de interpretação das instruções
+    
+    ICycle\Interpretation.Cycle :=
+        Begin
+        Repeat
+            Begin
+            IR <- Mp[PC] Next
+            PC <- PC + 1 Next
+            IExec() Next
+            If Interrupt.Enable And Interrupt.Request =>
+                Begin
+                Mp[0] <- PC Next
+                PC <- 1
+                End
+        End
+    End
+    
+    - Este é o ciclo de fetch-decode-execute
