@@ -1,0 +1,182 @@
+Processador
+=============
+
+* Microprocessador numa pastilha
+    - A interface de um microprocessador com o resto do sistema é por
+      meio de pinos de entrada e saída da pastilha.
+    - Tipicamente, há algumas centenas de pinos numa pastilha.
+    
+* A pastilhas do processador Intel 386 possui 132 pinos
+    
+                  .----------------------------.
+                  | () () () () () () () () () |
+                  | () () () () () () () () () |
+                  | () () () () () () () () () |
+                  | () () ()          () () () |
+                  | () () () Pastilha () () () |
+                  | () () ()          () () () |
+                  | () () () () () () () () () |
+                  | () () () () () () () () () |
+                  | () () () () () () () () () |
+                  '----------------------------'
+
+* Pinos típicos
+    
+                          .-----------.
+                          |           |
+           endereços <-|->|           |
+                          |           |---> bus árbitro
+                          |           |
+                          |           |<---
+                          |           |
+               dados <-|--|           |<--- coprocessador
+                          |           |
+                          |           |--->
+         control bus <----|           |
+                          |           |
+                     <----|           |---> status
+                          |           |
+                     ---->|           |--->
+                          |           |
+                          |           |<--- relógio
+                          |           |
+        interrupções ---->|           |<--- VDD (+5V ou menos)
+                          |           |
+                     ---->|           |<--- GND (terra)
+                          |           |
+                          '-----------'
+
+* Barramento ou bus
+    
+                   CPU               Memória
+              .-----------.       .-----------.
+              |           |       |           |
+              |           |       |           |
+              |           |       |           |
+              |           |       |           |
+              |           |       |           |
+              '-----------'       '-----------'
+               |    |    |         |    |    |
+      32b _____|____:____:_________|____:____:____ endereço
+                    |    |              |    |
+       1b __________|____:______________|____:____ sinal para leitura
+                         |                   |
+      32b _______________|___________________|____ dado lido
+    
+    - Os pinos do processador são ligados aos pinoos de outras pastilhas
+      (como memória) atrabés de linhas paralelas formando um barramento
+      ou "bus". A largura de um barramento é tipicamente algumas
+      centenas de linhas paralelas.
+
+* Mestre e escravo
+    - Os dispositivos conectads a um barramento podem ser mestre
+      (ativos/principais) e escravo (passivos/secundários).
+    
+    - Exemplos:
+        1. A CPU (mestre) manda o controlador de disco (escravo) ler um
+           bloco de disco.
+        2. O controlador de disco (mestre), tendo lido um bloco, comanda
+           a memória (escravo) para receber os dados lidos, por meio de
+           DMA - Direct Memry Access.
+    
+* "Bus drivers"
+
+         Master           Slave      Mestre/Escravo
+        .-------.       .-------.       .-------.
+        |       |       |       |       |       |
+        |       |       |       |       |       |
+        |       |       |       |       |       |
+        '-------'       '-------'       '-------'
+            |               |               |
+          .---.           .---.           .---.
+          |   | bus       |   | bus       |   | bus
+          '---' driver    '---' receiver  '---' transceiver
+            |               |               |
+        ____|_______________|_______________|_______ barramento
+    
+    - O bus driver/receiver/trasnceiver enviam/recebem/enviam e recebem
+      dados pelo barramento.
+    - Eles também judam AMPLIFICANDO o sinal elétrico, para que passam 
+      pelo barramento (geralmente FIOS) que são muito mais grossos e 
+      apresentam muito mais resistência.
+    
+    - Em geral, varios dispositivos estão conectados a um barramento,
+      mas apenas alguns delesestão de fato utilizando o mesmo.
+    - Para não interferir no barramento quando um dispositivo não o está
+      usando, as interfaces são em geral do tipo "tri-state".
+    - "Tri-state" significa três estados: 0, 1 ou em aberto (alta
+      impedância). Os dispostivos que não estão usando o barramento
+      não interferem nele.
+    
+* Barramentos locais
+    
+                       registradores
+                         .-------.
+                         |       |     |   |
+                         |       |_____|   |
+                         |       |     |   |
+                         |       |_____:___|
+                         |       |     |   |
+                         |       |     |   |
+                         |       |     |   |
+                         |       |     ^   ^
+                         '-------'   .-------.
+                                     |       |
+                                     |  ALU  |
+                                     |       |
+                                     '-------' 
+    
+* Alguma terminologia
+    - Um sinal é dito validade (em inglês, "asserted") se ele possui o
+      valor apropriado para causar uma certa ação.
+    - Para alguns pinos, validar um sinal significa fazer o sinal igual
+      a 1; para outros pinos, validar um sinal significa fazê-lo 0.
+    - Neste último caso, colocamos uma barra em cima do sinal, para
+      inficar que o sinal validado é zero. (aqui, representado entre ^).
+    - Assim, ^LEIA^ significa que a ação de leitura é ligada com 0.
+    
+* Ciclo de leitura
+    
+              CPU               Memória
+          .----------.       .----------.
+          |          |       |          |
+          |          |       |          |
+          |          |       |          |
+          |          |       |          |
+          |          |       |          |
+          '----------'       '----------'
+           |  |  |  |         |  |  |  |
+      _____|__:__:__:_________|__:__:__:___ ADDRESS
+      ________|__:__:____________|__:__:___ DATA
+      ___________|__:_______________|__:___ ^MREQ^
+      ______________:__________________:___ ^RD^
+    
+                   ____        ____        ____        __
+        CLOCK     /    \      /    \      /    \      /  
+                _/:    :\____/:    :\____/:    :\____/:  
+                  :    :      :    :      :    :      :
+                __:_  _:______:____:______:____:__  __:___
+        ADDRESS   : \/ :      :    :      :    :  \/  :
+                __:_/\_:______:____:______:____:__/\__:___
+                  :    :      :    :      :    :      :
+                __:_  _:______:____:______:_  _:___  _:___
+        DATA      : \/ :      :    :      : \/ :   \/ :
+                __:_/\_:______:____:______:_/\_:___/\_:___
+                  :    :      :    :      :    :      :    
+        ^MREQ^  __:____:__    :    :      :    :    __:___
+                  :    :  \   :    :      :    :   /  :
+                  :    :   \__:____:______:____:__/   :
+        ^RD^    __:____:__    :    :      :    :    __:___
+                  :    :  \   :    :      :    :   /  :
+                  :    :   \__:____:______:____:__/   :
+    
+    - Um ciclo de leitura é constituído de 3 ciclos do barramento
+    - No primeiro ciclo, o endereço é colocado pela CPU nas linhas
+      do endereço.
+    - Em seguida, as linhas ^MREQ^ e ^RD^ são validadas (com 0,
+      significando respectivamente pedido de acesso de memória e o tipo
+      de acesso é leitura.
+    - No segundo ciclo, nada é feito.
+    - Na descina do sinal de relófio do terceiro ciclo, a CPU lê os
+      dados do barramento de dados, guardando-os em um registrador. Em
+      seguida, a CPU coloca 1 nos sinais MREQ e RD, inibindo-os.
