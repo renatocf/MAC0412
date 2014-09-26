@@ -107,7 +107,7 @@ ISPS (Instruction Set Processor Specification)
         - A memória só tem 256 palavras; portanto os endereços são
           de 8 bits.
         - O endereço efetivo (de um operando ou uma instrução) é
-          obtida por uma regra de interŕetação, especificado na forma
+          obtido por uma regra de interpretação, especificado na forma
           de um algoritmo.
         
         - No PDP-8:
