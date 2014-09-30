@@ -182,3 +182,37 @@ Processador
     - Na descina do sinal de relófio do terceiro ciclo, a CPU lê os
       dados do barramento de dados, guardando-os em um registrador. Em
       seguida, a CPU coloca 1 nos sinais MREQ e RD, inibindo-os.
+    
+* "Bus arbiter" por "daisy chaining"
+    
+                         Pedidos de interrupção (bit)
+           .-------------.-------------.-------------.-------------.
+           |             ^             ^             ^             ^
+           |             |             |             |             |
+      .---------.   .---------.   .---------.   .---------.   .---------.
+      |         |   |         |   |         |   |         |   |         |
+      | Árbitro |-->| Disp. 1 |-->| Disp. 2 |-->| Disp. 3 |-->| Disp. 4 |
+      |         | : |         |   |         |   |         |   |         |
+      '---------' : '---------'   '---------'   '---------'   '---------'
+                  :
+          Concessão de interrupção
+    
+    - Todos os dispositivos emitem um bit para o árbitro dizendo que
+      alguém quer usar o barramento.
+    - A concessão para o uso do barramento é enviada para o dispositivo
+      1. Se este não pediu o uso, então passa o sinal de concessão para
+      o dispositivo 2 e assim sucessivamenteae chegar a um dispositivo
+      que pediu o uso.
+    - Este dispositivo, ao receber o sinal de concessão, deixa de 
+      encaminhar o sinal adiante e fica dono do barramento.
+    - Este processo é conhecido pelo nome de "daisy chaining".
+    - Este processo não é muito justo, pois como a concessão da
+      interrupão vai na ordem, pode ocorrer 'starvation' - em que
+      o dispositivo 4 NUNCA conseguiria usar o barramento.
+    
+* "Bus arbiter" - Outras formas
+    - O árbitro do barramento pode também usar a forma de concessão
+      chamada "polling", em que cada dispositivo é consultado, um a um,
+      para ver se precisa de interrupção.
+    - Outra forma de interrupção é a chamada "vetorada", em que o
+      endereço de tratamento de endereço é fornecido pelo dispositivo.

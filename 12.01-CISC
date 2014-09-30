@@ -1,0 +1,213 @@
+Arquiteutra CISC
+==================
+
+* Conceito de microprogramação
+    - Como surgiu
+    - Exemplos de máquinas CISC
+* A máquina MAC
+    - Descrição da máquina MAC
+    - COnjunto de instruções da máquina MAC
+* A arquiteutra MIC
+    - O que contém o processador
+    - Sinais de controle
+* O microprograma
+    - Execução das microinstruções
+    - O micro-assembler
+    - Microinstruções horizontais e verticais
+
+* Como surgiu a microprogramação
+    - Máquinas antigas tinhas poucas introuções, todas implementadas em 
+      hardware.
+    - Wilkes (1951) introduziu a MICROPROGRAMAÇÃO, que permite:
+        - um conjunto grande de instruções de máquina (no nível
+          convencional), usando
+        - um hardware simples capaz de executar apenas as chamadas
+          microinstruções.
+    - Cada instruçõa de máquina no nível convencional é interpretada e
+      pode dar origem à execução de muitas microsintruções.
+
+* Exemplos de máquinas CISC
+    - Os computadores que usam microprogramação são ditas CISC: Complex
+      Instruction Set Computer.
+    - Exemplos: IBM 360, DEC VAX, Motorola 68030, família Intel como
+      8088, 80386, Pentium, etc.
+    - Tanembaum usa uma máquina fictícia chamada MACpara ilustrar o
+      conceito de microprogramação.
+
+* No nível convencional, a máquina MAC apresenta as seguintes
+  características:
+    - Memória com 4096 palabras de 16 bits (endereço de 12 bits).
+    - Processador com 16 registradores, incluindo:
+        - PC (program counter)
+        - AC (acumulador)
+        - SP (stack pointer)
+    - Instrução de máquina (nível convencional) de 16 bits.
+
+* Conjunto de instruções da máquina MAC
+    - LODD (ac := m[x])
+    - STOD (m[x] := ac)
+    - ADDD (ac := ac + m[x])
+    - SUBD (ac := ac - m[x])
+    - JPOS (if ac >= 0 then pc := x)
+    - JZZR, JUMP, LOCO, LODL, STOL, ADDL, SUBL, JNEG, JNZE, CALL, 
+      PSHI, POPI, PUSH, POP, RETN, SWAP, INSP, DESP
+
+* A arquitetura MIC
+    - A arquitetura do processador (chamada (MIC) é simples e não
+      implementa as instruções de máquina do nível convencional
+      diretamente.
+    - Apresenta os seguintes componentes:
+        - Uma ALU capaz de fazer apenas 4 operações simples.
+        - Um shifter para deslocar 1 bit para a direita ou para a
+          esquerda.
+        - 16 registradores.
+        - Um multiplexador MUX de duas extradas.
+        - Três codificadores 4-para-16.
+            
+                        |           |--  0      Faz uma espécie de
+                        |           |--  1      "conversão" de um
+                 b -----|           |--  2      número na forma 
+                 b -----|           |--  3      binária para a 
+                 b -----|           |--  4      decimal, mandando 1
+                 b -----|           |--  5      para a saída que 
+                        |           |--  6      corresponderia ao 
+                        |           |--  7      número na base decimal
+                        |           |--  8      
+                        |           |--  9      (ex: 0101 faria sair
+                        |           |-- 10      um bit em 5)
+                        |           |-- 11
+                        |           |-- 12
+                        |           |-- 13
+                        |           |-- 14
+                        |           |-- 15
+                        
+        - Registradores MAR e MBR servindo de interface com a memória.
+        - Um relógio de 4 fases.
+            
+            |---------------- ciclo ----------------|
+            
+            |subciclo |subciclo |subciclo |subciclo |
+            :         :         :         :         :
+            :__       :__       :__       :__       :
+            :  |______|  |______|  |______|  |______:
+            :   __    :   __    :   __    :   __    :
+            :__|  |___:__|  |___:__|  |___:__|  |___:
+            :     __  :     __  :     __  :     __  :
+            :____|  |_:____|  |_:____|  |_:____|  |_:
+            :       __:       __:       __:       __:
+            :______|  |______|  |______|  |______|  :
+            :         :         :         :         :
+            :         :         :         :         :
+
+* Datapath do processador
+    
+        
+                C bus  .-------.     A bus     B bus
+                   ..--|   PC  |:::::::||.........
+                   ||--|   AC  |:::::::||.......||
+                   ||--|   SP  |:::::::||.......||
+                   ||--|   IR  |:::::::||.......||
+                   ||--|  TIR  |:::::::||.......||
+                   ||--|   0   |:::::::||.......||
+                   ||--|  +1   |:::::::||.......||
+                   ||--|  -1   |:::::::||.......||
+                   ||--| AMASK |:::::::||.......||
+                   ||--| SMASK |:::::::||.......||
+                   ||--|   A   |:::::::||.......||
+                   ||--|   B   |:::::::||.......||
+                   ||--|   C   |:::::::||.......||
+                   ||--|   D   |:::::::||.......||
+                   ||--|   E   |:::::::||.......||
+                   ||--|   F   |:::::::||.......||
+                   ||  '-------'       ||       ||
+                   ||              .-------. .-------.
+                   ||              |A latch| |B latch|
+  To address bus   ||              '-------' '-------'
+    / .-------.    ||                  ||       ||
+  <===|  MAR  |<===||==================||======= |
+      '-------'    ||                  ||       ||
+                   ||                  ||       ||
+  To data bus      ||                  ||       ||
+    / .-------.    ||                  ||       ||
+  ===>|  MBR  |====||===============.. ||       ||
+      '-------'    ||               || ||       ||
+          /\       ||               \/ \/       ||
+          ||       ||            .--------.     ||
+          ||       ||            |  AMUX  |     ||
+          ||       ||            '--------'     ||
+          ||       ||                ||         ||
+          ||       ||                \/         \/
+          ||       ||             \¨¨¨¨¨\      /¨¨¨¨¨/
+          ||       ||        f0 -->\     \    /     /--> N
+          ||       ||               \     \__/     /          
+          ||       ||        f1 ---->\            /----> Z
+          ||       ||                 \__________/
+          ||       ||                      ||      ALU
+          ||       ||                      \/
+          ||       ||                  .---------.
+          ||       ||                  | shifter |
+          ||       ||                  '---------'
+          |=================================|
+
+* Todo o ciclo da arquiteutura MIC é controlado por sinais de controle. 
+  Um conjunto desses sinais é chamado de MICROINSTRUÇÃO.
+
+* Sinais de controle de cada registrador
+    
+                      .-----------------.  16
+                 16   |                 |--/--> To A bus
+    From C bus --/--> | 16-bit register |
+                      |                 |---------/--To B bus
+                      '-----------------'        16
+                         ^     ^     ^
+                         CK   OE1   OE2
+    
+    - São 16 registradores no processador
+    - Cada um e cntrolado por 4 sinais de controle
+        - CK  = 1: valor do bus C é colocado dentro do rgistrador
+        - OE1 = 1: valor do registrador é colocado no bus A
+        - OE2 = 1: valor do registrador é colocado no bus B
+    - Como temos 16 registradores, precisaríamos de 18 bits somente 
+      para especificar cada microinstrução (elas podem ser bem grandes!)
+
+* Sinais de controle do multiplexador MUX
+    
+                          LEFT          RIGHT
+                           ||            ||
+                           \/            \/
+                        .--------------------.
+                        |                    |
+            Control --->| 2-to-1 Multiplexer |
+                        |                    |
+                        '--------------------'
+    
+    - O multiplexador MUX é controlado por 3 bits:
+    - Control = 0: a saída do MUX seleciona o bus LEFT.
+    - Control = 1: a saída do MUX seleciona o bus RIGHT.
+
+* Decodificador 4-para-16
+    
+                                Input
+                        |      |      |      |
+                  .-------------------------------.
+                  |        4-to-16 decoder        |
+                  '-------------------------------'
+                   | | | | | | | | | | | | | | | |
+                                Output
+
+    - O defodificador não precsa de sinais de controle
+
+* Sinais de controle da ALU
+                
+          A            B         : - A unidade aritmétio-lógica ALU 
+          ||          ||         :   sabe fazer 4 operações. Ela é
+          \/          \/         :   controlada por dois sinais f0 e f1:
+       \¨¨¨¨¨\      /¨¨¨¨¨/      :     - f0f1 = 00: saída igual a A + B
+  f0 -->\     \    /     /--> N  :     - f0f1 = 01: saída igual a A e B
+         \     \__/     /        :     - f0f1 = 10: saída igual a A
+  f1 ---->\            /    * Z  :     - f0f1 = 11: saída igual ao 
+           \__________/          :                  complemento de A
+                ||      ALU      :  - ALU produz ainda duas saídas 
+                \/               :    booleanas N e Z
+              F(A,B)             :     - N = 1 se o resultado é negativo
+                                 :     - Z = 1 se 
