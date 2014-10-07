@@ -1,0 +1,157 @@
+Arquitetura CISC
+==================
+                                                  1
+                        18  .-----------.<--------/----------------------.
+               .---------/--| C decoder |<--------/----------------------.
+               |            '-----------'< -*     4                      .
+               |        18  .-----------.   :                            .
+               |  .------/--| B decoder |<--------/----------------------.
+               |  |         '-----------'   :     4                      .
+               |  |     18  .-----------.   :                            .
+               |  |  .---/--| A decoder |<--------/----------------------.
+               |  |  |      '-----------'   :     4                      .
+               |  |  |                      :   .------------.           .
+     . - - - - | -|- | - - - - - - - - - - -*- -|4           |           .
+     :         |  |  |                     .- - |3 Clock     |           .
+     :         |  |  |                   .-:- - |2 Subcyckes |           .
+     :         ^  ^  ^                   : :  - |1           |           .
+     :         .-----.                   : :    '------------'           .
+     * - - - ->|     |                   : :          .-----.            .
+               |     |                   : :        .→| MUX |←-----------|
+               |     |                   : :        | '-----'            |
+        C bus  |     |    A bus    B bus : :        |    ↓               |
+           ..--|  PC |::::::||.........  : :        | .-----.            |
+           ||--|  AC |::::::||.......||  : :        '←| MPC |            |
+           ||--|  SP |::::::||.......||  : :          '-----'            |
+           ||--|  IR |::::::||.......||  : :             ↓               |
+           ||--| TIR |::::::||.......||  : : .-------------------------. |
+           ||--|  0  |::::::||.......||  : : |  256 x 32 microprogram  | |
+           ||--| +1  |::::::||.......||  : : '-------------------------' |
+           ||--| -1  |::::::||.......||  : :             ||              |
+           ||--|AMASK|::::::||.......||  : :   MIR       \/              |
+           ||--|SMASK|::::::||.......||  : : .-.-.-.-.-.-.-.-.-.-.-.-.-. |
+           ||--|  A  |::::::||.......||  : : |A|C|A|S|M|M|R|W|E|C|B|A|A| |
+           ||--|  B  |::::::||.......||  : : |M|O|L|H|B|A|D|R|N| | | |D| |
+           ||--|  C  |::::::||.......||  : : |U|N|U| |R|R| | |C| | | |D| |
+           ||--|  D  |::::::||.......||  : : |X|D| | | | | | | | | | |R| |
+           ||--|  E  |::::::||.......||  : : |1|2|2|2|1|1|1|1|1|4|4|4|8| |
+           ||--|  F  |::::::||.......||  :   '-'-'-'-'-'-'-'-'-'-'-'-'-' |
+           ||  '-----'      ||       ||  :    |                        '-'
+           ||         .- - -|| - - - ||- *--. |
+           ||         : .-------. .-------. | |
+    To     ||         '>|A latch| |B latch|<' |
+address bus||           '-------' '-------'   |
+  .-----.  ||               ||       ||       |
+<=| MAR |<=||===============||======= |       |
+  '-----'  ||               ||       ||       |
+    To     ||               ||       ||       |
+  data bus ||               ||       ||       |
+  .-----.  ||               ||       ||       |
+=>| MBR |==||============.. ||       ||       |
+  '-----'  ||            || ||       ||       |
+    /\     ||            \/ \/       ||       |
+    ||     ||         .--------.     ||       |
+    ||     ||       .-|  AMUX  |     ||       |
+    ||     ||       | '--------'     ||       |
+    ||     ||       '-----||---------||-------'
+    ||     ||             ||         ||
+    ||     ||             \/         \/
+    ||     ||          \¨¨¨¨¨\      /¨¨¨¨¨/N
+    ||     ||     f0 -->\     \    /     /-->
+    ||     ||            \     \__/     /  Z        
+    ||     ||     f1 ---->\            /---->
+    ||     ||              \__________/
+    ||     ||                   ||      ALU
+    ||     ||                   \/
+    ||     ||               .---------.
+    ||     ||               | shifter |
+    ||     ||               '---------'
+    |============================|
+
+* Microprogama
+    - O microprogama é um conjunto de microinstruções.
+    - Ele é armazenado numa memória ROM do processador, chamada 
+      control store.
+    - Há um MPC (micro progam counter) que aponta para a próxima 
+      microinstrução dentro do control store).
+    - Há um reistrador chamado MIR que armazena a microinstrução 
+      em execução.
+
+* 4 subciclos na execução da microinstrução
+    - Subciclo 1: carrea a próxima miroinstrução a ser executada 
+      num reistrador chamado MIR (micro instruction reiter)
+    - Subciclo 2: coloca valores dos registradores nos barramentos A
+      e B, carreando os A latch e B latch.
+    - Subciclo 3: dá o tempo necessário para a ALU e shifter produzierem
+      seu resultado, carreando-o no MAR se for o caso.
+    - Subciclo 4: armazena o resultado no registrador ou no MBR.
+
+* Dificuldade de escrever microinstruções
+    - Cada microinstrução consta de 32 bits (conforme já visto)
+    - Esses 32 bits determinam o que deve acontecer num ciclo
+      (4 subciclos)
+    - Escrever cada microinstrução é uma tarefa árdua (pois lida com 
+      o nível muito baixo - zeros e uns)
+
+* Formato da microinstrução
+
+        Bits  1 2  2  2  1 1 1 1 1  4    4    4      8
+             .-.--.--.--.-.-.-.-.-.----.----.----.--------.
+             |A|C |A |S |M|M|R|W|E| C  | B  | A  |   A    |
+             |M|O |L |H |B|A|D|R|N|    |    |    |   D    |
+             |U|N |U |  |R|R| | |C|    |    |    |   D    |
+             |X|D |  |  | | | | | |    |    |    |   R    |
+             '-'--'--'--'-'-'-'-'-'----'----'----'--------'
+    
+  AMUX         COND           ALU        SH                   MBR,MAR
+                                                              RD,WR,ENC
+  ----         ----           ---        --                   ---------
+  0 - A latch  0 No jump      0 A+B      0 No shift           0 - No
+  1- MBR       1 Jump if N=1  1 A AND B  1 Shift riht 1 bit   1 - Yes
+               2 Jump if Z=1  2 A        2 Shift left 1 bit   
+               3 Jump always  3 ¬A       3 (not used)         
+
+    - COND e ADDR: usados para controlar qual a próxima microinstrução 
+      a ser executada.
+        - ADDR: endereço da próxima instrução
+        - COND: condição para que a próxima microinstrução seja aquela
+          dada pela 
+
+* Micro-assembler
+    - Micro assembler (ou micro-montador) facilita a escrita de 
+      microinstruções por permitir mneumônicos e sómbolos parecidos
+      com um programa de alto nível.
+    - Na verdade o micro-assembler ainda é baixo nível, no sentido de
+      cada microinstrução em micro-assembler deve corresponder a uma
+      microinstrução de 32 bits.
+
+* Exemplo de microinstruções em micro-assembler
+    - Uma microinstrução em micro assembler pode ser assim:
+        pc := pc + 1
+    - Ela corresponde a uma microinstrução de  bits, onde
+        MUX=0  (Recebe do registrador)
+        A =0   (Registrador 0 é PC)
+        B =6   (Registrador 6 contém o número 1)
+        C =0
+        ALU=0 (0 corresponde à operação soma na ALU)
+        ENC=1 (indica que o resultado da ALU deve voltar ao registrador 0)
+    - Fica mais fácil escrever pc := pc + 1 do que:
+        00000000001000001100000
+
+* Microprograma
+    - Para especificar os bits que controlam a ALU, usamos '+',
+      'band' ou 'inv'. Exemplos:
+        - pc  := pc + 1
+        - ac  := band(ac,tir)
+        - tir := inv(tir)
+    - Para especificar os bits SH que controlam o "shifter", usamos as
+      funções lshift e rshift:
+        - ac  := rshift(ir)
+        - tir := lshift(tir)
+    - Uso de desvio confiional if
+        - Desvio incondicional usa o comando goto. Exemplo: goto 12
+        - Desvios condicionais podem testar N ou Z (saída da ALU
+          negativa ou zero). Exemplos:
+            - ac := ac + 1; if z then goto 45
+              Note que tudo isso acima pode er erado por uma 
+              microinstrução de 32 bits.
